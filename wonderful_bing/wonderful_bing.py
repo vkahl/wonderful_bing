@@ -5,7 +5,7 @@
 A wallpaper a day, keep the doctor away.
 
 Usage:
-  bing set [-d DIRECTORY] ENVIRONMENT
+  bing set [-d DIRECTORY] [-s] ENVIRONMENT
   bing story
   bing -V | --version
   bing -h | --help
@@ -13,12 +13,14 @@ Usage:
 Arguments:
   ENVIRONMENT                your desktop environment. Currently we support
                              gnome, gnome2, cinnamon, xfce4, mate.
+                             If you're desktop isn't listed, try "pywal".
 
 Options:
   -h, --help                 show the help info and exit
   -V, --version              show the version and exit
   -d, --directory=DIRECTORY  specify where to save the download picture
                              [default: /tmp]
+  -s, --save-story           save the picture story alongside the image
 """
 
 from __future__ import absolute_import, unicode_literals, print_function
@@ -125,6 +127,7 @@ class WonderfulBing(object):
         self.directory = path.abspath(arguments['--directory'])
         self.bing = Bing()
         self.picture_path = path.join(self.directory, self.bing.picture_name)
+        self.save_story = arguments['--save-story']
         self.picture_story_path = path.join(
             self.directory,
             path.splitext(self.picture_path)[0] + ".txt",
@@ -147,11 +150,12 @@ class WonderfulBing(object):
         print("Successfully download the picture to --> {0}.".format(
               self.picture_path))
         
-        # Save the story to a txt file alongside the picture
-        with open(self.picture_story_path, "w") as f:
-            f.write(self.bing.picture_story)
-        print("Successfully saved the picture story to --> {0}.".format(
-              self.picture_story_path))
+        if self.save_story:
+            # Save the story to a txt file alongside the picture
+            with open(self.picture_story_path, "w") as f:
+                f.write(self.bing.picture_story)
+            print("Successfully saved the picture story to --> {0}.".format(
+                self.picture_story_path))
 
     def rock(self):
         """Download the picture, set as wallpaper, show the notify."""
