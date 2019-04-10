@@ -35,7 +35,7 @@ setup(
     ],
     keywords='bing wallpaper',
     packages=['wonderful_bing'],
-    install_requires=['docopt>=0.6.2', 'requests>=2.4.0'],
+    install_requires=['docopt>=0.6.2', 'requests>=2.4.0', 'pywal>=3.3.0'],
     include_package_data=True,
     entry_points={
         'console_scripts': [

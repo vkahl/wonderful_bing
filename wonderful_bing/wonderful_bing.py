@@ -56,8 +56,8 @@ class Bing(object):
 
     @property
     def picture_name(self):
-        match = re.search("(?<=/az/hprichbg/rb/).+?(?=_)", self.picture_url)
-        picture_name = match.group() + '.jpg'
+        match = re.search("\?id\=OHR\.(\w+)\_.+", self.picture_url)
+        picture_name = match.group(1) + '.jpg'
         return picture_name
 
 
@@ -73,6 +73,7 @@ class Computer(object):
              "picture-filename '{0}'"): ['mate'],
             ("DISPLAY=:0 xfconf-query -c xfce4-desktop "
              "-p /backdrop/screen0/monitor0/image-path -s {0}"): ['xfce4'],
+            ("wal -i '{0}'"): ["wal", "pywal"],
         }
 
     def _get_command(self, environment):
@@ -124,6 +125,10 @@ class WonderfulBing(object):
         self.directory = path.abspath(arguments['--directory'])
         self.bing = Bing()
         self.picture_path = path.join(self.directory, self.bing.picture_name)
+        self.picture_story_path = path.join(
+            self.directory,
+            path.splitext(self.picture_path)[0] + ".txt",
+        )
 
     def download_picture(self):
         if path.exists(self.picture_path):
@@ -141,6 +146,12 @@ class WonderfulBing(object):
                 f.write(chunk)
         print("Successfully download the picture to --> {0}.".format(
               self.picture_path))
+        
+        # Save the story to a txt file alongside the picture
+        with open(self.picture_story_path, "w") as f:
+            f.write(self.bing.picture_story)
+        print("Successfully saved the picture story to --> {0}.".format(
+              self.picture_story_path))
 
     def rock(self):
         """Download the picture, set as wallpaper, show the notify."""
