@@ -5,7 +5,7 @@
 A wallpaper a day, keep the doctor away.
 
 Usage:
-  bing set [-d DIRECTORY] [-s] ENVIRONMENT
+  bing set [-d DIRECTORY] [-s] [--xfce4-path XFCE4_PATH] ENVIRONMENT
   bing story
   bing -V | --version
   bing -h | --help
@@ -20,6 +20,8 @@ Options:
   -V, --version              show the version and exit
   -d, --directory=DIRECTORY  specify where to save the download picture
                              [default: /tmp]
+  --xfce4-path=XFCE4_PATH    specify the image path for the relevant monitor
+                             [default: /backdrop/screen0/monitor0/image-path]
   -s, --save-story           save the picture story alongside the image
 """
 
@@ -74,7 +76,7 @@ class Computer(object):
              "/usr/bin/gsettings set org.mate.background "
              "picture-filename '{0}'"): ['mate'],
             ("DISPLAY=:0 xfconf-query -c xfce4-desktop "
-             "-p /backdrop/screen0/monitor0/image-path -s {0}"): ['xfce4'],
+             "-p {1} -s {0}"): ['xfce4'],
             ("wal -i '{0}'"): ["wal", "pywal"],
         }
 
@@ -88,7 +90,7 @@ class Computer(object):
             return [item[0] for item in self.command_table.items()
                     if environment in item[1]][0]
 
-    def set_wallpaper(self, environment, picture_path):
+    def set_wallpaper(self, environment, picture_path, xfce4_path):
         """Set the given picture as wallpaper.
 
         :param environment: the desktop environment.
@@ -101,7 +103,8 @@ class Computer(object):
                  "Please file an issue or make a pull request :) \n"
                  "https://github.com/lord63/wonderful_bing").format(
                      environment))
-        status = subprocess.Popen(command.format(picture_path), shell=True)
+        status = subprocess.Popen(command.format(picture_path, xfce4_path),
+                                  shell=True)
         status.wait()
         if status.returncode == 0:
             print("Successfully set the picture as the wallpaper. :)")
@@ -124,6 +127,7 @@ class Computer(object):
 class WonderfulBing(object):
     def __init__(self, arguments):
         self.environment = arguments['ENVIRONMENT']
+        self.xfce4_path = arguments['--xfce4-path']
         self.directory = path.abspath(arguments['--directory'])
         self.bing = Bing()
         self.picture_path = path.join(self.directory, self.bing.picture_name)
@@ -161,7 +165,8 @@ class WonderfulBing(object):
         """Download the picture, set as wallpaper, show the notify."""
         self.download_picture()
         computer = Computer()
-        computer.set_wallpaper(self.environment, self.picture_path)
+        computer.set_wallpaper(self.environment, self.picture_path,
+                               self.xfce4_path)
         computer.show_notify(self.bing.picture_story)
 
 
