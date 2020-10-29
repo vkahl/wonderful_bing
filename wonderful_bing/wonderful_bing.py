@@ -13,7 +13,7 @@ Usage:
 Arguments:
   ENVIRONMENT                your desktop environment. Currently we support
                              gnome, gnome2, cinnamon, xfce4, mate.
-                             If you're desktop isn't listed, try "pywal".
+                             If your desktop isn't listed, try "pywal" or "feh"
 
 Options:
   -h, --help                 show the help info and exit
@@ -78,6 +78,7 @@ class Computer(object):
             ("DISPLAY=:0 xfconf-query -c xfce4-desktop "
              "-p {1} -s {0}"): ['xfce4'],
             ("wal -i '{0}'"): ["wal", "pywal"],
+            ("feh --bg-scale '{0}'"): ["feh"],
         }
 
     def _get_command(self, environment):
