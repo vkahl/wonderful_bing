@@ -5,7 +5,7 @@
 A wallpaper a day, keep the doctor away.
 
 Usage:
-  bing set [-d DIRECTORY] [-s] [--xfce4-path XFCE4_PATH] ENVIRONMENT
+  bing set [-d DIRECTORY] [-s] [-r] [--xfce4-path XFCE4_PATH] ENVIRONMENT
   bing story
   bing -V | --version
   bing -h | --help
@@ -23,6 +23,7 @@ Options:
   --xfce4-path=XFCE4_PATH    specify the image path for the relevant monitor
                              [default: /backdrop/screen0/monitor0/image-path]
   -s, --save-story           save the picture story alongside the image
+  -r, --reapply              reapply the wallpaper if it has already been downloaded
 """
 
 from __future__ import absolute_import, unicode_literals, print_function
@@ -137,11 +138,14 @@ class WonderfulBing(object):
             self.directory,
             path.splitext(self.picture_path)[0] + ".txt",
         )
+        self.reapply = arguments["--reapply"]
 
     def download_picture(self):
         if path.exists(self.picture_path):
             print("You have downloaded the picture before.")
             print("Have a look at it --> {0}".format(self.picture_path))
+            if self.reapply:
+                self.apply_wallpaper()
             sys.exit()
         # Sleep for two seconds, otherwise the newly setted wallpaper
         # will be setted back by the system when your system boots up
@@ -165,6 +169,9 @@ class WonderfulBing(object):
     def rock(self):
         """Download the picture, set as wallpaper, show the notify."""
         self.download_picture()
+        self.apply_wallpaper()
+    
+    def apply_wallpaper(self):
         computer = Computer()
         computer.set_wallpaper(self.environment, self.picture_path,
                                self.xfce4_path)
